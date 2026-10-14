@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UFO Gọi Bài</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="game" aria-label="Sân trường với UFO gọi học sinh lên bảng"></canvas>
+
+  <header class="hud-top">
+    <div class="brand panel">
+      <div class="brand-logo" aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="34" height="34">
+          <ellipse cx="24" cy="20" rx="9" ry="8" fill="#bff7ff" opacity=".9"/>
+          <ellipse cx="24" cy="26" rx="20" ry="6" fill="#e9eef8"/>
+          <ellipse cx="24" cy="28" rx="11" ry="3" fill="#5d6680"/>
+          <circle cx="12" cy="26" r="1.8" fill="#ff5d73"/><circle cx="24" cy="30" r="1.8" fill="#ffd23f"/><circle cx="36" cy="26" r="1.8" fill="#6af2c5"/>
+          <path d="M19 31 L14 44 H34 L29 31 Z" fill="#8cfff0" opacity=".45"/>
+        </svg>
+      </div>
+      <div>
+        <h1>UFO Gọi Bài</h1>
+        <p id="classLabel">Lớp học</p>
+      </div>
+    </div>
+    <div class="tools panel">
+      <button id="btnSound" class="icon-btn" title="Bật/tắt âm thanh (M)" aria-label="Bật/tắt âm thanh">
+        <svg class="on" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
+        <svg class="mute" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/></svg>
+      </button>
+      <button id="btnFull" class="icon-btn" title="Toàn màn hình (F)" aria-label="Toàn màn hình">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
+      <button id="btnSettings" class="icon-btn" title="Danh sách lớp & lịch sử" aria-label="Danh sách lớp">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <footer class="hud-bottom panel">
+    <div class="stepper" aria-label="Số bạn bị gọi">
+      <button id="countDec" aria-label="Bớt 1 bạn">−</button>
+      <div class="count"><b id="countVal">2</b><small>bạn</small></div>
+      <button id="countInc" aria-label="Thêm 1 bạn">+</button>
+    </div>
+    <button id="btnSummon" class="summon">
+      <span>Gọi UFO</span><kbd>Space</kbd>
+    </button>
+    <div id="statLabel" class="stat"></div>
+  </footer>
+
+  <aside id="drawer" class="drawer panel" hidden>
+    <div class="drawer-head">
+      <h2>Danh sách lớp</h2>
+      <button id="btnCloseDrawer" class="icon-btn" aria-label="Đóng">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <label class="field">
+      <span>Tên lớp</span>
+      <input id="inpClass" type="text" maxlength="40" placeholder="VD: Lớp 8A1">
+    </label>
+    <label class="field">
+      <span>Học sinh <em id="nameCount"></em></span>
+      <textarea id="inpNames" rows="11" spellcheck="false" placeholder="Mỗi dòng một bạn"></textarea>
+      <small class="hint">Mỗi dòng một tên. Dán thẳng từ Excel cũng được.</small>
+    </label>
+    <label class="check">
+      <input id="chkNoRepeat" type="checkbox">
+      <span>Không gọi lại bạn đã lên bảng (đến khi cả lớp hết lượt)</span>
+    </label>
+    <div class="row">
+      <button id="btnSaveDrawer" class="btn primary">Lưu danh sách</button>
+      <button id="btnResetRound" class="btn">Đặt lại lượt gọi</button>
+    </div>
+    <div class="history">
+      <div class="history-head">
+        <h3>Lịch sử gọi bài</h3>
+        <button id="btnClearHistory" class="link">Xóa</button>
+      </div>
+      <ul id="historyList"></ul>
+    </div>
+    <p class="keys"><kbd>Space</kbd> gọi UFO · <kbd>↑</kbd><kbd>↓</kbd> số bạn · <kbd>F</kbd> toàn màn hình · <kbd>M</kbd> âm thanh</p>
+  </aside>
+
+  <div id="modal" class="modal" hidden>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <div class="card-head">
+        <span class="badge">THÔNG BÁO KHẨN TỪ UFO</span>
+        <h2 id="resultTitle">HS được mời lên bảng trả bài</h2>
+        <p id="resultMeta"></p>
+      </div>
+      <ul id="resultList" class="result-list"></ul>
+      <div class="actions">
+        <button id="btnAgain" class="btn ghost">Gọi tiếp</button>
+        <button id="btnRelease" class="btn primary">Thả các bạn về <kbd>Enter</kbd></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast panel" role="status" hidden></div>
+
+  <script src="js/util.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/vehicles.js"></script>
+  <script src="js/background.js"></script>
+  <script src="js/student.js"></script>
+  <script src="js/ufo.js"></script>
+  <script src="js/director.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
